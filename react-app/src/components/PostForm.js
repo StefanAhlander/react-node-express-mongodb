@@ -3,13 +3,13 @@ import axios from 'axios';
 
 import DisplayPosts from './DisplayPosts';
 
-export default function PostFormHooks() {
+export default function PostForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [oldPosts, setOldPosts] = useState([]);
   const [sentData, setSentData] = useState(false);
 
-  useEffect(function loadPosts() {
+  useEffect(() => {
     const getPosts = async () => {
       try {
         const response = await axios
@@ -50,7 +50,7 @@ export default function PostFormHooks() {
           name="title"
           type="text"
           value={title}
-          onChange={evt => setTitle(evt.target.value)}
+          onChange={({ target: { value } }) => setTitle(value)}
         />
         <br />
         <h1>Description</h1>
@@ -58,7 +58,7 @@ export default function PostFormHooks() {
           name="description"
           type="text"
           value={description}
-          onChange={evt => setDescription(evt.target.value)}
+          onChange={({ target: { value } }) => setDescription(value)}
         />
         <br />
         <input type="submit" value="Submit" />
