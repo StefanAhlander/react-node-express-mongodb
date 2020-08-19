@@ -1,89 +1,70 @@
-import React from 'react';
-const axios = require('axios');
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-class PostForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { title: '', description: '' };
+import DisplayPosts from './DisplayPosts';
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
+export default function PostFormHooks() {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [oldPosts, setOldPosts] = useState([]);
+  const [sentData, setSentData] = useState(false);
 
-  componentDidMount() {
-    axios
-      .get('http://localhost:5000/posts')
-      .then((response) => {
-        console.log(
-          'I have these posts\n\n' + JSON.stringify(response.data, null, 2)
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+  useEffect(function loadPosts() {
+    const getPosts = async () => {
+      try {
+        const response = await axios
+          .get('http://localhost:5000/posts');
 
-  handleChange(event) {
-    const target = event.target;
-    const name = target.name;
-    const value = target.value;
+        setOldPosts(response.data);
+        console.log(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getPosts();
+    setSentData(false);
+  }, [sentData]);
 
-    this.setState({ [name]: value });
-  }
+  const handleSubmit = async (evt) => {
+    evt.preventDefault();
 
-  handleSubmit(event) {
-    event.preventDefault();
+    try {
+      await axios
+        .post('http://localhost:5000/posts', {
+          title,
+          description
+        });
+      setSentData(true);
+    } catch (err) {
+      console.log(err);
+    }
+    setTitle('');
+    setDescription('');
+  };
 
-    axios
-      .post('http://localhost:5000/posts', {
-        title: this.state.title,
-        description: this.state.description,
-      })
-      .then(function (response) {
-        console.log(
-          'We added post object:\n\n' + JSON.stringify(response.data, null, 2)
-        );
-
-        axios
-          .get('http://localhost:5000/posts')
-          .then((response) => {
-            console.log(
-              'I have now these posts\n\n' +
-                JSON.stringify(response.data, null, 2)
-            );
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit}>
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
         <h1>Title</h1>
         <input
           name="title"
           type="text"
-          value={this.state.title}
-          onChange={this.handleChange}
+          value={title}
+          onChange={evt => setTitle(evt.target.value)}
         />
         <br />
         <h1>Description</h1>
         <input
           name="description"
           type="text"
-          value={this.state.description}
-          onChange={this.handleChange}
+          value={description}
+          onChange={evt => setDescription(evt.target.value)}
         />
         <br />
         <input type="submit" value="Submit" />
       </form>
-    );
-  }
-}
 
-export default PostForm;
+      <DisplayPosts posts={oldPosts} />
+    </div>
+  );
+}
