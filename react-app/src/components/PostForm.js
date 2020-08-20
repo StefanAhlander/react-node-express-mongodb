@@ -4,8 +4,7 @@ import axios from 'axios';
 import DisplayPosts from './DisplayPosts';
 
 export default function PostForm() {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [post, setPost] = useState({ title: '', description: '' });
   const [oldPosts, setOldPosts] = useState([]);
   const [reload, triggerReload] = useState(0);
 
@@ -22,21 +21,23 @@ export default function PostForm() {
     })();
   }, [reload]);
 
+  const handleChange = ({ target: { name, value } }) =>
+    setPost({ ...post, [name]: value });
+
   const handleSubmit = async (evt) => {
     evt.preventDefault();
 
     try {
       await axios
         .post('http://localhost:5000/posts', {
-          title,
-          description
+          title: post.title,
+          description: post.description
         });
       triggerReload(reload + 1);
     } catch (err) {
       console.log(err);
     }
-    setTitle('');
-    setDescription('');
+    setPost({ title: '', description: '' });
   };
 
   return (
@@ -46,16 +47,16 @@ export default function PostForm() {
         <input
           name="title"
           type="text"
-          value={title}
-          onChange={({ target: { value } }) => setTitle(value)}
+          value={post.title}
+          onChange={handleChange}
         />
         <br />
         <h1>Description</h1>
         <input
           name="description"
           type="text"
-          value={description}
-          onChange={({ target: { value } }) => setDescription(value)}
+          value={post.description}
+          onChange={handleChange}
         />
         <br />
         <input type="submit" value="Submit" />
