@@ -7,7 +7,7 @@ export default function PostForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [oldPosts, setOldPosts] = useState([]);
-  const [sentData, setSentData] = useState(false);
+  const [reload, triggerReload] = useState(0);
 
   useEffect(() => {
     const getPosts = async () => {
@@ -22,8 +22,7 @@ export default function PostForm() {
       }
     };
     getPosts();
-    setSentData(false);
-  }, [sentData]);
+  }, [reload]);
 
   const handleSubmit = async (evt) => {
     evt.preventDefault();
@@ -34,7 +33,7 @@ export default function PostForm() {
           title,
           description
         });
-      setSentData(true);
+      triggerReload(reload + 1);
     } catch (err) {
       console.log(err);
     }
