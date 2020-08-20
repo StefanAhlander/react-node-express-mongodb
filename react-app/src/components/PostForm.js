@@ -10,7 +10,7 @@ export default function PostForm() {
   const [reload, triggerReload] = useState(0);
 
   useEffect(() => {
-    const getPosts = async () => {
+    (async () => {
       try {
         const response = await axios
           .get('http://localhost:5000/posts');
@@ -19,8 +19,7 @@ export default function PostForm() {
       } catch (err) {
         console.log(err);
       }
-    };
-    getPosts();
+    })();
   }, [reload]);
 
   const handleSubmit = async (evt) => {
