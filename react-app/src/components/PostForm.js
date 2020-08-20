@@ -16,7 +16,6 @@ export default function PostForm() {
           .get('http://localhost:5000/posts');
 
         setOldPosts(response.data);
-        console.log(response.data);
       } catch (err) {
         console.log(err);
       }
